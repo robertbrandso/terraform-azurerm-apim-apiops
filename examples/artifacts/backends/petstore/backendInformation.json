@@ -1,0 +1,29 @@
+{
+  "properties": {
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "url": "https://app-example-prod.azurewebsites.net/api/v3",
+    
+    "validateCertificateChain": true,
+    "validateCertificateName": true,
+
+    "azureResourceManagerId": "https://management.azure.com/subscriptions/4cc5ebd5-f801-424c-8066-0d03fb4d90d7/resourceGroups/rg-example-prod/providers/Microsoft.Web/sites/func-example-prod",
+
+    "credentials": {
+      "headers": {
+        "named-value-example": "{{name-of-named-value}}",
+        "lorem-ipsum": "dolor-sit-amet"
+      },
+      "query": {
+        "named-value-example": "{{name-of-named-value}}",
+        "lorem-ipsum": "dolor-sit-amet"
+      },
+      "certificates": [
+        "https://kv-example-prod.vault.azure.net/secrets/lorem-ipsum"
+      ],
+      "authorization": {
+        "scheme": "Basic",
+        "parameter": "username:password"
+      }
+    }
+  }
+}

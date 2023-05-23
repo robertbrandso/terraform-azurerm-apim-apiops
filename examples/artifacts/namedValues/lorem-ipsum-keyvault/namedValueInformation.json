@@ -1,0 +1,6 @@
+{
+  "properties": {
+    "displayName": "lorem-ipsum",
+    "keyVaultSecretId": "https://kv-example-prod.vault.azure.net/secrets/lorem-ipsum"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "aad_groups": [
+    "AzureAD-Group-01",
+    "AzureAD-Group-02"
+  ],
+  "local_groups": [
+    "Local-Group-on-APIM-01",
+    "Local-Group-on-APIM-02"
+  ]
+}

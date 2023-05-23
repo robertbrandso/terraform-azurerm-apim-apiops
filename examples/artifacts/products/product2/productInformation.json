@@ -1,0 +1,24 @@
+{
+  "properties": {
+    "displayName": "Lorem ipsum",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "published": true,
+    "subscriptionRequired": true,
+    "approvalRequired": false,
+    "subscriptionsLimit": 3,
+    "terms": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut turpis velit, vehicula non fermentum elementum, elementum ac felis.",
+    "apis": [
+      "conference",
+      "petstore"
+    ],
+    "groups": [
+      "Developers",
+      "AzureAD-Group-01",
+      "Local-Group-on-APIM-01"
+    ],
+    "tags": [
+      "tag1",
+      "tag2"
+    ]
+  }
+}

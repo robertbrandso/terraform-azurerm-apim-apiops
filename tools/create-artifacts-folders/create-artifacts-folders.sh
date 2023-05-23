@@ -1,0 +1,9 @@
+mkdir artifacts
+mkdir artifacts/apis
+mkdir artifacts/apiVersionSets
+mkdir artifacts/backends
+mkdir artifacts/certificates
+mkdir artifacts/groups
+mkdir artifacts/namedValues
+mkdir artifacts/products
+mkdir artifacts/tags

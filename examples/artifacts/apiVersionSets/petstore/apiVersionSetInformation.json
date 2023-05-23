@@ -1,0 +1,9 @@
+{
+  "properties": {
+    "displayName": "Petstore",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "versioningScheme": "Query",
+    "versionHeaderName": null,
+    "versionQueryName": "version"
+  }
+}

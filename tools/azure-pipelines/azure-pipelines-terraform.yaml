@@ -1,0 +1,233 @@
+# ------------------
+# TERRAFORM PIPELINE
+# ------------------
+
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    exclude:
+    - README.md
+
+variables:
+  service_connection_name: "Azure DevOps Service connection name" # Name of the service connection to the Azure environment in Azure DevOps.
+  tf_version: "1.4.6" # Version of terraform to use. Use 'latest' to always use latest version available.
+  tf_state_rg_name: "rg-example-prod" # Name of the resource group to use for the Terraform state file.
+  tf_state_sa_name: "storageaccountname" # Name of the storage account to use for the Terraform state file.
+  tf_state_container_name: "tfstate" # Name of the storage container use for the Terraform state file.
+  tf_environment: "prod" # Enviroment name, can be used for the state file name among others.
+  terraform_directory: "$(System.DefaultWorkingDirectory)" # Directory where the Terraform files are stored.
+  api_directory: "$(System.DefaultWorkingDirectory)/artifacts/apis" # Directory where the API specification files are stored.
+  apilint_enabled: false # Set to true to run Stoplight Spectral for API lint.
+
+pool:
+  vmImage: "ubuntu-latest"
+
+stages:
+
+  # -----------------------------------
+  # STAGE: LINT API DEFINITION
+  # This stage will:
+  # * Run Stoplight Spectral (optional)
+  # -----------------------------------
+
+  - stage: "lintApi"
+    displayName: "Lint API definition"
+    jobs:
+
+      # -------------------------------------
+      # JOB: STOPLIGHT SPECTRAL
+      # This job will:
+      # * Install Stoplight Spectral
+      # * Run Stoplight Spectral
+      # -------------------------------------
+
+      - job: "lintApi"
+        displayName: "Stoplight Spectral > install, lint"
+        condition: eq(variables.apilint_enabled, 'true')
+        steps:
+        - task: Npm@1
+          displayName: "Install > Stoplight Spectral"
+          inputs:
+            command: custom
+            verbose: false
+            customCommand: "install -g @stoplight/spectral"
+
+        - checkout: self
+          fetchDepth: 0
+
+        - script: spectral lint "$(api_directory)/**/specification.json" -r https://raw.githubusercontent.com/connectedcircuits/devops-api-linter/main/rules.yaml
+          displayName: "Run > Lint API definition"
+
+  # ---------------------------------
+  # STAGE: TERRAFORM PLAN AND CHECKOV
+  # This stage will:
+  # * Run terraform plan
+  # ---------------------------------
+
+  - stage: "terraformPlan"
+    displayName: "Terraform Plan"
+    jobs:
+
+      # ---------------------------------------------------------------------------------------------------------------
+      # JOB: TERRAFORM PLAN
+      # Uses extension: https://marketplace.visualstudio.com/items?itemName=charleszipp.azure-pipelines-tasks-terraform
+      # This job will:
+      # * Install the chosen version of Terraform
+      # * Run terraform init to initialize the backend and download the providers
+      # * Run terraform validate to validate the code
+      # * Run terraform plan to view planned changes
+      # * Run terraform version to view Terraform version and provider version and log warning if outdated
+      # * Check if changes will be made and approval is required
+      # * Publish the plan file to a artifact so we can assure that the apply stage only does what plan shows
+      # ----------------------------------------------------------------------------------------------------------------
+            
+      - job: "terraformPlan"
+        displayName: "Terraform > install, init, validate & plan"
+        steps:
+
+          - task: TerraformInstaller@0
+            displayName: "Install > terraform"
+            inputs:
+              terraformVersion: "$(tf_version)"
+
+          - task: TerraformCLI@0
+            displayName: "Run > terraform init"
+            inputs:
+              command: "init"
+              backendType: "azurerm"
+              backendServiceArm: "$(service_connection_name)"
+              backendAzureRmResourceGroupName: $(tf_state_rg_name)
+              backendAzureRmStorageAccountName: $(tf_state_sa_name)
+              backendAzureRmContainerName: $(tf_state_container_name)
+              backendAzureRmKey: "$(tf_environment).terraform.tfstate"
+              workingDirectory: $(terraform_directory)
+
+          - task: TerraformCLI@0
+            displayName: "Run > terraform validate"
+            continueOnError: false
+            inputs:
+              command: "validate"
+              environmentServiceName: "$(service_connection_name)"
+              workingDirectory: $(terraform_directory)
+
+          - task: TerraformCLI@0
+            displayName: "Run > terraform plan"
+            inputs:
+              command: "plan"
+              environmentServiceName: "$(service_connection_name)"
+              publishPlanResults: "PlanResults"
+              commandOptions: "-out=$(Build.ArtifactStagingDirectory)/$(Build.Buildnumber).tfplan"
+              workingDirectory: $(terraform_directory)
+            name: "plan"
+
+          - task: TerraformCLI@0
+            displayName: "Run > terraform version"
+            inputs:
+              command: "version"
+              environmentServiceName: "$(service_connection_name)"
+              workingDirectory: $(terraform_directory)
+
+          - bash: |
+              if
+                terraform show $(Build.ArtifactStagingDirectory)/$(Build.Buildnumber).tfplan | grep "Your infrastructure matches the configuration."
+              then
+                echo "##[section]No changes. Your infrastructure matches the configuration. Terraform apply will not run."
+              else
+                echo "##[section]Terraform apply requires manual approval."
+                echo "##vso[task.setvariable variable=approvalRequired;isOutput=true]true"
+              fi
+            name: checkIfAnyChanges
+            displayName: "Check > Require approval"
+            workingDirectory: $(terraform_directory)
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish > Terraform Plan Artifact'
+            inputs:
+              artifactName: 'TerraformArtifact'
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              patterns: '**/$(Build.Buildnumber).tfplan'
+              publishLocation: 'Container'
+
+
+  # ----------------------------
+  # STAGE: TERRAFORM APPLY
+  # This stage will:
+  # * Wait for manual validation
+  # * Run terraform apply
+  # ----------------------------
+
+  - stage: "terraformApply"
+    displayName: "Terraform Apply"
+    dependsOn: "terraformPlan"
+    jobs:
+
+      # ----------------------------------------------------------------------------
+      # JOB: MANUAL VALIDATION
+      # This job will:
+      # * Be skipped if previous job failed or no changes detected by terraform plan
+      # * Wait for a manual approval before continuing to next job
+      # ----------------------------------------------------------------------------
+
+      - job: "waitForValidation"
+        displayName: "Wait > Wait for manual approval"
+        variables: 
+          approvalRequired: $[stageDependencies.terraformPlan.terraformPlan.outputs['checkIfAnyChanges.approvalRequired']]
+        condition: |
+          and
+            (
+              succeeded(),
+              eq(variables['approvalRequired'], 'true')
+            )
+        pool: "server"
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+          - task: ManualValidation@0
+            displayName: "Wait > Manual approval"
+            timeoutInMinutes: 1440 # 1 day
+
+        # ---------------------------------------------------------------------------------------------------------------
+        # JOB: TERRAFORM APPLY
+        # Uses extension: https://marketplace.visualstudio.com/items?itemName=charleszipp.azure-pipelines-tasks-terraform
+        # This job will:
+        # * Download the artifact with the plan file
+        # * Install the chosen version of Terraform
+        # * Run terraform init to initialize the backend and download the providers
+        # * Run terraform apply with the plan file to apply the changes
+        # ---------------------------------------------------------------------------------------------------------------
+      - job: "TerraformApply"
+        displayName: "Terraform > install, init & apply"
+        timeoutInMinutes: 180
+        dependsOn: "waitForValidation"
+        steps:
+
+          - download: 'current'
+            displayName: 'Download > Plan file'
+            artifact: 'TerraformArtifact'
+            patterns: '**/$(Build.Buildnumber).tfplan'
+
+          - task: TerraformInstaller@0
+            displayName: "Install > terraform"
+            inputs:
+              terraformVersion: "$(tf_version)"
+
+          - task: TerraformCLI@0
+            displayName: "Run > terraform init"
+            inputs:
+              command: "init"
+              backendType: "azurerm"
+              backendServiceArm: "$(service_connection_name)"
+              backendAzureRmResourceGroupName: $(tf_state_rg_name)
+              backendAzureRmStorageAccountName: $(tf_state_sa_name)
+              backendAzureRmContainerName: $(tf_state_container_name)
+              backendAzureRmKey: "$(tf_environment).terraform.tfstate"
+              workingDirectory: $(terraform_directory)
+
+          - task: TerraformCLI@0
+            displayName: "Run > terraform apply"
+            inputs:
+              command: "apply"
+              commandOptions: "$(Agent.BuildDirectory)/TerraformArtifact/$(Build.Buildnumber).tfplan"
+              environmentServiceName: "$(service_connection_name)"
+              workingDirectory: $(terraform_directory)

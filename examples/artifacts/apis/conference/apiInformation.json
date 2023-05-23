@@ -1,0 +1,7 @@
+{
+  "properties": {
+    "displayName": "Demo Conference API",
+    "description": "A sample API with information related to a technical conference.",
+    "path": "conference"
+  }
+}

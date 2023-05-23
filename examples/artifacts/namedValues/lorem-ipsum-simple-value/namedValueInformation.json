@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "displayName": "lorem-ipsum",
+    "value": "dolor-sit",
+    "tags": [
+      "tag1",
+      "tag2"
+    ]
+  }
+}

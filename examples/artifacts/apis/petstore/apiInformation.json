@@ -1,0 +1,76 @@
+{
+  "properties": {
+    "displayName": "Swagger Petstore - OpenAPI 3.0",
+    "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
+    "apiRevision": "1",
+    "path": "petstore",
+    "apiVersionSet": {
+      "version": "v1",
+      "versionSetName": "swagger-petstore"
+    },
+    "subscriptionRequired": false,
+    "subscriptionKeyParameterNames": {
+      "header": "Ocp-Apim-Subscription-Key",
+      "query": "subscription-key"
+    },
+    "protocols": [
+      "https"
+    ],
+    "serviceUrl": "https://petstore3.swagger.io/api/v3",
+    "contact": {
+      "name": "John Doe",
+      "email": "apiteam@swagger.io",
+      "url": "https://petstore3.swagger.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "termsOfService": "http://swagger.io/terms/",
+    "tags": [],
+    "diagnosticLogs": {
+
+      "samplingPercentage": 50,
+      "alwaysLogErrors": true,
+      "logClientIp": true,
+      "verbosity": "error",
+      "operationNameFormat": "Url",
+
+      "frontendRequests": {
+        "headersToLog": ["content-type", "accept", "origin"],
+        "bodyBytes": "32"
+      },
+
+      "frontendResponse": {
+        "headersToLog": ["content-type", "accept", "origin"],
+        "bodyBytes": "32",
+        "dataMasking": {
+          "headers": {
+            "mode": "Mask",
+            "value": "content-type"
+          },
+          "queryParams": {
+            "mode": "Mask",
+            "value": "accept"
+          }
+        }
+      },
+
+      "backendRequest": {
+        "headersToLog": ["content-type", "accept", "origin"],
+        "bodyBytes": "32",
+        "dataMasking": {
+          "queryParams": {
+            "mode": "Hide",
+            "value": "origin"
+          }
+        }
+      },
+
+      "backendResponse": {
+        "headersToLog": ["content-type", "accept", "origin"],
+        "bodyBytes": "32"
+      }
+    }
+  }
+}

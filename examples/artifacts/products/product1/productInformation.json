@@ -1,0 +1,9 @@
+{
+  "properties": {
+    "displayName": "Lorem ipsum",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "published": true,
+    "subscriptionRequired": false,
+    "approvalRequired": false
+  }
+}

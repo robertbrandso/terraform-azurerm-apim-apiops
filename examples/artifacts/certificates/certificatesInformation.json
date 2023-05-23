@@ -1,0 +1,7 @@
+{
+  "certificates": [
+    "https://kv-example-prod.vault.azure.net/secrets/certificate1",
+    "https://kv-example-prod.vault.azure.net/secrets/certificate2/850c734d51ce765b87234f7ed16bf654c",
+    "https://kv-example-prod.vault.azure.net/secrets/certificate3"
+  ]
+}
