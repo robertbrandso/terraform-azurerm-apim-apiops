@@ -3,7 +3,8 @@ provider "azurerm" {
 }
 
 module "apiops" {
-  source = ".."
+  source  = "robertbrandso/apim-apiops/azurerm"
+  version = "1.0.0"
 
   # API Management
   api_management_name                = "apim-example-prod"
