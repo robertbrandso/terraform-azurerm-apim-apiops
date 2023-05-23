@@ -5,7 +5,7 @@ The API developers don't have to have any knowledge about Terraform, since all t
 
 ## Resources
 * [Wiki](https://github.com/robertbrandso/terraform-azurerm-apim-apiops/wiki)
-* [Examples](examples/)
+* [Example configuration](https://github.com/robertbrandso/terraform-azurerm-apim-apiops/tree/main/examples)
 * [Terraform registry](https://registry.terraform.io/modules/robertbrandso/apim-apiops)
 
 ## Architecture

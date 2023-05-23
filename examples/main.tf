@@ -5,10 +5,6 @@ provider "azurerm" {
 module "apiops" {
   source = ".."
 
-  # Basics
-  artifacts_path         = "artifacts"
-  allow_api_without_path = true
-
   # API Management
   api_management_name                = "apim-example-prod"
   api_management_resource_group_name = "rg-example-apim-prod"
