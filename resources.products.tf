@@ -6,8 +6,8 @@ locals {
   products_path = "${var.artifacts_path}/products"
 
   # Name of the files holding the information and policy
-  product_information_file = "productInformation.json"
-  product_policy_file      = "policy.xml"
+  product_information_file = var.product_information_filename
+  product_policy_file      = var.product_policy_filename
 
   # Lists all files in products folder
   all_product_files = fileset(local.products_path, "**")

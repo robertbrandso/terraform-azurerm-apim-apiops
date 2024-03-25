@@ -1,7 +1,7 @@
 # Azure API Management (APIM) APIOps Terraform module
-APIM APIOps allows you to publish and manage your APIs through Azure API Management (APIM) in a GitOps way. This means that all publishing and configuration of the APIs are done through a git repository. This is accomplished through configuration in JSON files, as well as the OpenAPI specification in either JSON or YAML format.
+APIM APIOps enables you to publish and manage your APIs via Azure API Management (APIM) using a GitOps approach. This involves conducting all publishing and configuration of the APIs via a git repository. Such operations are facilitated through configuration in JSON files, alongside the OpenAPI specification available in either JSON or YAML format.
 
-The API developers don't have to have any knowledge about Terraform, since all the configuration are done through JSON files.
+API developers are not required to possess any knowledge about Terraform, as all configurations are executed through JSON files.
 
 ## Resources
 * [Wiki](https://github.com/robertbrandso/terraform-azurerm-apim-apiops/wiki)

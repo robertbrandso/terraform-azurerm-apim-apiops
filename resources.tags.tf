@@ -6,7 +6,7 @@ locals {
   tags_path = "${var.artifacts_path}/tags"
 
   # Name of the file holding the information
-  tags_information_file = "tagsInformation.json"
+  tags_information_file = var.tags_information_filename
 
   # Tags information file full path
   apim_tags = "${local.tags_path}/${local.tags_information_file}"

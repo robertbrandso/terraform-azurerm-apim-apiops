@@ -6,7 +6,7 @@ locals {
   named_values_path = "${var.artifacts_path}/namedValues"
 
   # Name of the file holding the information
-  named_value_information_file = "namedValueInformation.json"
+  named_value_information_file = var.named_value_information_filename
 
   # Lists all files in named value folder
   all_named_values_files = fileset(local.named_values_path, "**")

@@ -6,7 +6,7 @@ locals {
   groups_path = "${var.artifacts_path}/groups"
 
   # Name of the file holding the information
-  groups_information_file = "groupsInformation.json"
+  groups_information_file = var.groups_information_filename
 
   # Group information file full path
   apim_groups = "${local.groups_path}/${local.groups_information_file}"
