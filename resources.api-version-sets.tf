@@ -6,7 +6,7 @@ locals {
   api_version_sets_path = "${var.artifacts_path}/apiVersionSets"
 
   # Name of the file holding the information
-  api_version_set_information_file = "apiVersionSetInformation.json"
+  api_version_set_information_file = var.api_version_set_information_filename
 
   # Lists all files in API version set folders
   all_api_version_sets_files = fileset(local.api_version_sets_path, "**")

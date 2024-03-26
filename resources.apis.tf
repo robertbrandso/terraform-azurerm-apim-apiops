@@ -6,10 +6,10 @@ locals {
   apis_path = "${var.artifacts_path}/apis"
 
   # Name of the files holding the information, specification and policy
-  api_information_file        = "apiInformation.json"
-  api_specification_file_json = "specification.json"
-  api_specification_file_yaml = "specification.yaml"
-  api_policy_file             = "policy.xml"
+  api_information_file        = var.api_information_filename
+  api_specification_file_json = var.api_specification_filename_json
+  api_specification_file_yaml = var.api_specification_filename_yaml
+  api_policy_file             = var.api_policy_filename
 
   # Lists all json files in apis folder
   all_api_files = fileset(local.apis_path, "**")

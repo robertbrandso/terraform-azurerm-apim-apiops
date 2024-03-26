@@ -6,7 +6,7 @@ locals {
   certificates_path = "${var.artifacts_path}/certificates"
 
   # Name of the file holding the information
-  certificates_information_file = "certificatesInformation.json"
+  certificates_information_file = var.certificates_information_filename
 
   # Certificate information file full path
   certificates = "${local.certificates_path}/${local.certificates_information_file}"

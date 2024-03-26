@@ -6,7 +6,7 @@ locals {
   backend_path = "${var.artifacts_path}/backends"
 
   # Name of the file holding the information
-  backend_information_file = "backendInformation.json"
+  backend_information_file = var.backend_information_filename
 
   # Lists all files in backend folder
   all_backend_files = fileset(local.backend_path, "**")
