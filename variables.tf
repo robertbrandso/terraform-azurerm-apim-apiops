@@ -74,6 +74,12 @@ variable "api_policy_filename" {
   default     = "policy.xml"
 }
 
+variable "api_policy_fallback_to_default_filename" {
+  description = "(Optional) Option to fallback to policy.xml if policy file in var.api_policy_filename doesn't exist."
+  type        = bool
+  default     = false
+}
+
 ## backends
 variable "backend_information_filename" {
   description = "(Optional) Filename for the backend configuration file."
@@ -113,6 +119,12 @@ variable "product_policy_filename" {
   description = "(Optional) Filename for the product policy file."
   type        = string
   default     = "policy.xml"
+}
+
+variable "product_policy_fallback_to_default_filename" {
+  description = "(Optional) Option to fallback to policy.xml if policy file in var.product_policy_filename doesn't exist."
+  type        = bool
+  default     = false
 }
 
 ## tags
