@@ -160,8 +160,8 @@ resource "azurerm_api_management_api_policy" "main" {
   api_management_name = data.azurerm_api_management.main.name
   resource_group_name = data.azurerm_api_management.main.resource_group_name
 
-  api_name    = azurerm_api_management_api.main[each.key].name
-  
+  api_name = azurerm_api_management_api.main[each.key].name
+
   # Using the value configured in local.api_policy_file if it exists. If the file doesn't exist, it looks for the fallback file (policy.xml) if the option is set to true in var.api_policy_fallback_to_default_filename.
   xml_content = fileexists("${local.apis_path}/${each.key}/${local.api_policy_file}") ? file("${local.apis_path}/${each.key}/${local.api_policy_file}") : (var.api_policy_fallback_to_default_filename && fileexists("${local.apis_path}/${each.key}/${local.api_policy_fallback_file}")) ? file("${local.apis_path}/${each.key}/${local.api_policy_fallback_file}") : null
 }
