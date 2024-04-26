@@ -6,8 +6,9 @@ locals {
   products_path = "${var.artifacts_path}/products"
 
   # Name of the files holding the information and policy
-  product_information_file = var.product_information_filename
-  product_policy_file      = var.product_policy_filename
+  product_information_file     = var.product_information_filename
+  product_policy_file          = var.product_policy_filename
+  product_policy_fallback_file = "policy.xml"
 
   # Lists all files in products folder
   all_product_files = fileset(local.products_path, "**")
@@ -110,13 +111,21 @@ resource "azurerm_api_management_product_policy" "main" {
   # Only create if policy file and product information file exists.
   for_each = toset([
     for directory in local.products : directory if
-    fileexists("${local.products_path}/${directory}/${local.product_policy_file}") &&
-    fileexists("${local.products_path}/${directory}/${local.product_information_file}")
+    fileexists("${local.products_path}/${directory}/${local.product_information_file}") ||
+    (
+      fileexists("${local.products_path}/${directory}/${local.product_policy_file}") &&
+      (
+        var.product_policy_fallback_to_default_filename &&
+        fileexists("${local.apis_path}/${directory}/${local.product_policy_fallback_file}")
+      )
+    )
   ])
 
   api_management_name = data.azurerm_api_management.main.name
   resource_group_name = data.azurerm_api_management.main.resource_group_name
 
-  product_id  = azurerm_api_management_product.main[each.key].product_id
-  xml_content = file("${local.products_path}/${each.key}/${local.product_policy_file}")
+  product_id = azurerm_api_management_product.main[each.key].product_id
+
+  # Using the value configured in local.product_policy_file if it exists. If the file doesn't exist, it looks for the fallback file (policy.xml) if the option is set to true in var.product_policy_fallback_to_default_filename.
+  xml_content = fileexists("${local.apis_path}/${each.key}/${local.product_policy_file}") ? file("${local.apis_path}/${each.key}/${local.product_policy_file}") : (var.product_policy_fallback_to_default_filename && fileexists("${local.apis_path}/${each.key}/${local.product_policy_fallback_file}")) ? file("${local.apis_path}/${each.key}/${local.product_policy_fallback_file}") : null
 }

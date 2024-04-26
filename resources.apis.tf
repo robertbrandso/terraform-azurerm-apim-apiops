@@ -10,6 +10,7 @@ locals {
   api_specification_file_json = var.api_specification_filename_json
   api_specification_file_yaml = var.api_specification_filename_yaml
   api_policy_file             = var.api_policy_filename
+  api_policy_fallback_file    = "policy.xml"
 
   # Lists all json files in apis folder
   all_api_files = fileset(local.apis_path, "**")
@@ -142,8 +143,14 @@ resource "azurerm_api_management_api_policy" "main" {
   # Only create if policy file exists. API files must also exists - if not the policy will not be created.
   for_each = toset([
     for directory in local.apis : directory if
-    fileexists("${local.apis_path}/${directory}/${local.api_policy_file}") &&
     fileexists("${local.apis_path}/${directory}/${local.api_information_file}") &&
+    (
+      fileexists("${local.apis_path}/${directory}/${local.api_policy_file}") ||
+      (
+        var.api_policy_fallback_to_default_filename &&
+        fileexists("${local.apis_path}/${directory}/${local.api_policy_fallback_file}")
+      )
+    ) &&
     (
       fileexists("${local.apis_path}/${directory}/${local.api_specification_file_json}") ||
       fileexists("${local.apis_path}/${directory}/${local.api_specification_file_yaml}")
@@ -153,8 +160,10 @@ resource "azurerm_api_management_api_policy" "main" {
   api_management_name = data.azurerm_api_management.main.name
   resource_group_name = data.azurerm_api_management.main.resource_group_name
 
-  api_name    = azurerm_api_management_api.main[each.key].name
-  xml_content = file("${local.apis_path}/${each.key}/${local.api_policy_file}")
+  api_name = azurerm_api_management_api.main[each.key].name
+
+  # Using the value configured in local.api_policy_file if it exists. If the file doesn't exist, it looks for the fallback file (policy.xml) if the option is set to true in var.api_policy_fallback_to_default_filename.
+  xml_content = fileexists("${local.apis_path}/${each.key}/${local.api_policy_file}") ? file("${local.apis_path}/${each.key}/${local.api_policy_file}") : (var.api_policy_fallback_to_default_filename && fileexists("${local.apis_path}/${each.key}/${local.api_policy_fallback_file}")) ? file("${local.apis_path}/${each.key}/${local.api_policy_fallback_file}") : null
 }
 
 # Diagnostic log settings for API
