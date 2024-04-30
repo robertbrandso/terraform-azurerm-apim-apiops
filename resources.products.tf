@@ -26,13 +26,13 @@ resource "azurerm_api_management_product" "main" {
   resource_group_name = data.azurerm_api_management.main.resource_group_name
 
   display_name = jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.displayName
-  description  = jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.description
+  description  = try(jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.description, null)
   published    = jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.published
-  terms        = can(jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.terms) ? jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.terms : null
+  terms        = try(jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.terms, null)
 
   subscription_required = jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.subscriptionRequired
   approval_required     = jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.approvalRequired
-  subscriptions_limit   = can(jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.subscriptionsLimit) ? jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.subscriptionsLimit : null
+  subscriptions_limit   = try(jsondecode(file("${local.products_path}/${each.key}/${local.product_information_file}")).properties.subscriptionsLimit, null)
 }
 
 # Add API(s) to product 
@@ -111,12 +111,12 @@ resource "azurerm_api_management_product_policy" "main" {
   # Only create if policy file and product information file exists.
   for_each = toset([
     for directory in local.products : directory if
-    fileexists("${local.products_path}/${directory}/${local.product_information_file}") ||
+    fileexists("${local.products_path}/${directory}/${local.product_information_file}") &&
     (
-      fileexists("${local.products_path}/${directory}/${local.product_policy_file}") &&
+      fileexists("${local.products_path}/${directory}/${local.product_policy_file}") ||
       (
         var.product_policy_fallback_to_default_filename &&
-        fileexists("${local.apis_path}/${directory}/${local.product_policy_fallback_file}")
+        fileexists("${local.products_path}/${directory}/${local.product_policy_fallback_file}")
       )
     )
   ])
@@ -126,6 +126,6 @@ resource "azurerm_api_management_product_policy" "main" {
 
   product_id = azurerm_api_management_product.main[each.key].product_id
 
-  # Using the value configured in local.product_policy_file if it exists. If the file doesn't exist, it looks for the fallback file (policy.xml) if the option is set to true in var.product_policy_fallback_to_default_filename.
-  xml_content = fileexists("${local.apis_path}/${each.key}/${local.product_policy_file}") ? file("${local.apis_path}/${each.key}/${local.product_policy_file}") : (var.product_policy_fallback_to_default_filename && fileexists("${local.apis_path}/${each.key}/${local.product_policy_fallback_file}")) ? file("${local.apis_path}/${each.key}/${local.product_policy_fallback_file}") : null
+  # Using the value configured in local.product_policy_file if it exists. If the file doesn't exist, it looks for the fallback file (policy.xml).
+  xml_content = try(file("${local.products_path}/${each.key}/${local.product_policy_file}"), file("${local.products_path}/${each.key}/${local.product_policy_fallback_file}"))
 }

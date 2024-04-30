@@ -37,23 +37,23 @@ resource "azurerm_api_management_api" "main" {
   api_type            = "http"
 
   display_name = jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.displayName
-  description  = jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.description
+  description  = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.description, null)
 
-  revision              = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.apiRevision) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.apiRevision : 1
-  subscription_required = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.subscriptionRequired) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.subscriptionRequired : true
-  protocols             = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.protocols) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.protocols : ["https"]
+  revision              = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.apiRevision, 1)
+  subscription_required = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.subscriptionRequired, true)
+  protocols             = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.protocols, ["https"])
 
-  service_url          = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.serviceUrl) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.serviceUrl : null
-  terms_of_service_url = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.termsOfService) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.termsOfService : null
+  service_url          = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.serviceUrl, null)
+  terms_of_service_url = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.termsOfService, null)
 
   # Set var.allow_api_without_path to false or true to choose between if the path property should be mandatory or not.
   # This is controlled and checked in the postcondition block.
-  path = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.path) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.path : null
+  path = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.path, null)
 
   # If version is set, version_set_id also need to be set.
   # version_set_id depends on azurerm_api_management_api_version_set.main
-  version        = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.apiVersionSet) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.apiVersionSet.version : null
-  version_set_id = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.apiVersionSet) ? azurerm_api_management_api_version_set.main[jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.apiVersionSet.versionSetName].id : null
+  version        = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.apiVersionSet.version, null)
+  version_set_id = try(azurerm_api_management_api_version_set.main[jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.apiVersionSet.versionSetName].id, null)
 
   # Subscription key parameter names
   dynamic "subscription_key_parameter_names" {
@@ -71,8 +71,8 @@ resource "azurerm_api_management_api" "main" {
     for_each = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.license) ? ["true"] : []
     content {
       # Only create each property if value exists in specification file
-      name = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.license.name) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.license.name : null
-      url  = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.license.url) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.license.url : null
+      name = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.license.name, null)
+      url  = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.license.url, null)
     }
   }
 
@@ -82,9 +82,9 @@ resource "azurerm_api_management_api" "main" {
     for_each = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact) ? ["true"] : []
     content {
       # Only create each property if value exists in specification file
-      name  = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact.name) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact.name : null
-      email = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact.email) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact.email : null
-      url   = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact.url) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact.url : null
+      name  = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact.name, null)
+      email = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact.email, null)
+      url   = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.contact.url, null)
     }
   }
 
@@ -162,8 +162,8 @@ resource "azurerm_api_management_api_policy" "main" {
 
   api_name = azurerm_api_management_api.main[each.key].name
 
-  # Using the value configured in local.api_policy_file if it exists. If the file doesn't exist, it looks for the fallback file (policy.xml) if the option is set to true in var.api_policy_fallback_to_default_filename.
-  xml_content = fileexists("${local.apis_path}/${each.key}/${local.api_policy_file}") ? file("${local.apis_path}/${each.key}/${local.api_policy_file}") : (var.api_policy_fallback_to_default_filename && fileexists("${local.apis_path}/${each.key}/${local.api_policy_fallback_file}")) ? file("${local.apis_path}/${each.key}/${local.api_policy_fallback_file}") : null
+  # Using the value configured in local.api_policy_file if it exists. If the file doesn't exist, it looks for the fallback file (policy.xml).
+  xml_content = try(file("${local.apis_path}/${each.key}/${local.api_policy_file}"), file("${local.apis_path}/${each.key}/${local.api_policy_fallback_file}"))
 }
 
 # Diagnostic log settings for API
@@ -187,12 +187,12 @@ resource "azurerm_api_management_api_diagnostic" "main" {
   api_name   = azurerm_api_management_api.main[each.key].name
   identifier = "applicationinsights"
 
-  sampling_percentage       = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.samplingPercentage) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.samplingPercentage : 100
-  always_log_errors         = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.alwaysLogErrors) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.alwaysLogErrors : false
-  log_client_ip             = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.logClientIp) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.logClientIp : true
-  verbosity                 = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.verbosity) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.verbosity : "information"
-  http_correlation_protocol = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.correlationProtocol) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.correlationProtocol : "Legacy"
-  operation_name_format     = can(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.operationNameFormat) ? jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.operationNameFormat : "Name"
+  sampling_percentage       = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.samplingPercentage, 100)
+  always_log_errors         = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.alwaysLogErrors, false)
+  log_client_ip             = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.logClientIp, true)
+  verbosity                 = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.verbosity, "information")
+  http_correlation_protocol = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.correlationProtocol, "Legacy")
+  operation_name_format     = try(jsondecode(file("${local.apis_path}/${each.key}/${local.api_information_file}")).properties.diagnosticLogs.operationNameFormat, "Name")
 
   # Advanced options
   ## Frontend request

@@ -26,7 +26,7 @@ resource "azurerm_api_management_named_value" "main" {
 
   display_name = jsondecode(file("${local.named_values_path}/${each.key}/${local.named_value_information_file}")).properties.displayName
 
-  value  = can(jsondecode(file("${local.named_values_path}/${each.key}/${local.named_value_information_file}")).properties.value) ? jsondecode(file("${local.named_values_path}/${each.key}/${local.named_value_information_file}")).properties.value : null
+  value  = try(jsondecode(file("${local.named_values_path}/${each.key}/${local.named_value_information_file}")).properties.value, null)
   secret = can(jsondecode(file("${local.named_values_path}/${each.key}/${local.named_value_information_file}")).properties.keyVaultSecretId) ? true : false
 
   # System Assigned identity of the API Management Service will be used as default to authenticate against Key Vault
@@ -37,5 +37,5 @@ resource "azurerm_api_management_named_value" "main" {
     }
   }
 
-  tags = can(jsondecode(file("${local.named_values_path}/${each.key}/${local.named_value_information_file}")).properties.tags) ? jsondecode(file("${local.named_values_path}/${each.key}/${local.named_value_information_file}")).properties.tags : null
+  tags = try(jsondecode(file("${local.named_values_path}/${each.key}/${local.named_value_information_file}")).properties.tags, null)
 }

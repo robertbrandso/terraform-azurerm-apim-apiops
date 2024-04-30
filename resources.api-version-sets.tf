@@ -25,7 +25,7 @@ resource "azurerm_api_management_api_version_set" "main" {
   display_name      = jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.displayName
   versioning_scheme = jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.versioningScheme
 
-  description         = can(jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.description) ? jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.description : null
-  version_header_name = can(jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.versionHeaderName) ? jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.versionHeaderName : null
-  version_query_name  = can(jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.versionQueryName) ? jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.versionQueryName : null
+  description         = try(jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.description, null)
+  version_header_name = try(jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.versionHeaderName, null)
+  version_query_name  = try(jsondecode(file("${local.api_version_sets_path}/${each.key}/${local.api_version_set_information_file}")).properties.versionQueryName, null)
 }
