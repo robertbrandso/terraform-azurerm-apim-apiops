@@ -1,5 +1,5 @@
 # Changelog
-## v1.2.1 - 2024-30-04
+## v1.2.1 - 2024-04-30
 * Make description field in APIs and Products optional.
 * Fix logic error in product policy resource introduced in v1.2.0.
 * Using `try()` instead of conditional `can()` in arguments.
