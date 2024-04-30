@@ -24,18 +24,18 @@ resource "azurerm_api_management_backend" "main" {
   api_management_name = data.azurerm_api_management.main.name
   resource_group_name = data.azurerm_api_management.main.resource_group_name
 
-  description = can(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.description) ? jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.description : null
+  description = try(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.description, null)
   protocol    = "http"
 
   url         = jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.url
-  resource_id = can(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.azureResourceManagerId) ? jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.azureResourceManagerId : null
+  resource_id = try(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.azureResourceManagerId, null)
 
   dynamic "tls" {
     # Only create if validateCertificateChain and/or validateCertificateName is defined
     for_each = can(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.validateCertificateChain) || can(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.validateCertificateName) ? ["true"] : []
     content {
-      validate_certificate_chain = can(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.validateCertificateChain) ? jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.validateCertificateChain : null
-      validate_certificate_name  = can(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.validateCertificateName) ? jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.validateCertificateName : null
+      validate_certificate_chain = try(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.validateCertificateChain, null)
+      validate_certificate_name  = try(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.validateCertificateName, null)
     }
   }
 
@@ -43,8 +43,8 @@ resource "azurerm_api_management_backend" "main" {
     for_each = can(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.credentials) ? ["true"] : []
     content {
       # Reference to a named value in "header" need to be referenced as "{{named-value-name}}". Source: https://github.com/hashicorp/terraform-provider-azurerm/issues/14548
-      header = can(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.credentials.headers) ? jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.credentials.headers : null
-      query  = can(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.credentials.query) ? jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.credentials.query : null
+      header = try(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.credentials.headers, null)
+      query  = try(jsondecode(file("${local.backend_path}/${each.key}/${local.backend_information_file}")).properties.credentials.query, null)
 
       # If the certificate property in backend information file is present, add the certificate(s).
       # For loop creates new list with thumbprints which is retrived from azurerm_api_management_certificate.main.
