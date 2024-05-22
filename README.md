@@ -8,7 +8,7 @@ API developers are not required to possess any knowledge about Terraform, as all
 * [Example configuration](https://github.com/robertbrandso/terraform-azurerm-apim-apiops/tree/main/examples)
 * [Terraform registry](https://registry.terraform.io/modules/robertbrandso/apim-apiops)
 
-## Architecture
+## Flow
 The diagram below illustrates the flow of APIM APIOps.
 
-![APIM APIOps flow](https://github.com/robertbrandso/terraform-azurerm-apim-apiops/wiki/images/apiops-flow.png)
+[![APIM APIOps flow](https://github.com/robertbrandso/terraform-azurerm-apim-apiops/wiki/images/apiops-flow.drawio.png)](https://github.com/robertbrandso/terraform-azurerm-apim-apiops/wiki/images/apiops-flow.drawio.png)
