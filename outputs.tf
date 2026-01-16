@@ -4,7 +4,7 @@
 
 output "api_management" {
   description = "The API Management resource."
-  value = data.azurerm_api_management.main.resource_group_name
+  value = data.azurerm_api_management.main
 }
 
 output "api_version_sets" {
