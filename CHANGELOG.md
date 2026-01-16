@@ -1,4 +1,7 @@
 # Changelog
+## v1.2.2 - 2026-01-16
+* Add outputs for the resources created.
+
 ## v1.2.1 - 2024-04-30
 * Make description field in APIs and Products optional.
 * Fix logic error in product policy resource introduced in v1.2.0.
