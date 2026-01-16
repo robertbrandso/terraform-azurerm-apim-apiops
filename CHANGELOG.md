@@ -1,6 +1,6 @@
 # Changelog
 ## v1.2.2 - 2026-01-16
-* Add outputs for the resources IDs created.
+* Add outputs for the resources created.
 
 ## v1.2.1 - 2024-04-30
 * Make description field in APIs and Products optional.

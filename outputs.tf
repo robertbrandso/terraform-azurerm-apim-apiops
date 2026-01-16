@@ -2,27 +2,32 @@
 # OUTPUTS
 # -------
 
-output "apim_api_version_set_id" {
-  description = "The ID of the API Version Sets created."
-  value       = azurerm_api_management_api_version_set.main[*].id
+output "api_management" {
+  description = "The API Management resource."
+  value = data.azurerm_api_management.main.resource_group_name
 }
 
-output "apim_api_id" {
-  description = "The ID of the APIs created."
-  value       = azurerm_api_management_api.main[*].id
+output "api_version_sets" {
+  description = "The API Version Sets created."
+  value       = azurerm_api_management_api_version_set.main[*]
 }
 
-output "apim_backend_id" {
-  description = "The ID of the Backends created."
-  value       = azurerm_api_management_backend.main[*].id
+output "apis" {
+  description = "The APIs created."
+  value       = azurerm_api_management_api.main[*]
 }
 
-output "apim_named_value_id" {
-  description = "The ID of the Named Values created."
-  value       = azurerm_api_management_named_value.main[*].id
+output "backends" {
+  description = "The Backends created."
+  value       = azurerm_api_management_backend.main[*]
 }
 
-output "apim_product_id" {
-  description = "The ID of the Products created."
-  value       = azurerm_api_management_product.main[*].id
+output "named_values" {
+  description = "The Named Values created."
+  value       = azurerm_api_management_named_value.main[*]
+}
+
+output "products" {
+  description = "The Products created."
+  value       = azurerm_api_management_product.main[*]
 }
