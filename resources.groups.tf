@@ -14,7 +14,7 @@ locals {
 
 # Get data about Azure AD groups to use the object ID
 data "azuread_group" "apim_groups" {
-  for_each = can(jsondecode(file(local.apim_groups)).aad_groups) ? toset(jsondecode(file(local.apim_groups)).aad_groups) : []
+  for_each = can(jsondecode(file(local.apim_groups)).aad_groups) ? toset(jsondecode(file(local.apim_groups)).aad_groups) : toset([])
 
   display_name = each.key
 }
@@ -24,7 +24,7 @@ data "azuread_group" "apim_groups" {
 
 ## Azure AD groups
 resource "azurerm_api_management_group" "aad" {
-  for_each = can(jsondecode(file(local.apim_groups)).aad_groups) ? toset(jsondecode(file(local.apim_groups)).aad_groups) : []
+  for_each = can(jsondecode(file(local.apim_groups)).aad_groups) ? toset(jsondecode(file(local.apim_groups)).aad_groups) : toset([])
 
   api_management_name = data.azurerm_api_management.main.name
   resource_group_name = data.azurerm_api_management.main.resource_group_name
@@ -38,7 +38,7 @@ resource "azurerm_api_management_group" "aad" {
 
 ## Local groups on APIM
 resource "azurerm_api_management_group" "local" {
-  for_each = can(jsondecode(file(local.apim_groups)).local_groups) ? toset(jsondecode(file(local.apim_groups)).local_groups) : []
+  for_each = can(jsondecode(file(local.apim_groups)).local_groups) ? toset(jsondecode(file(local.apim_groups)).local_groups) : toset([])
 
   api_management_name = data.azurerm_api_management.main.name
   resource_group_name = data.azurerm_api_management.main.resource_group_name

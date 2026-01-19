@@ -14,7 +14,7 @@ locals {
 
 # Add certificates on API Management scope
 resource "azurerm_api_management_certificate" "main" {
-  for_each = can(jsondecode(file(local.certificates)).certificates) ? toset(jsondecode(file(local.certificates)).certificates) : []
+  for_each = can(jsondecode(file(local.certificates)).certificates) ? toset(jsondecode(file(local.certificates)).certificates) : toset([])
 
   api_management_name = data.azurerm_api_management.main.name
   resource_group_name = data.azurerm_api_management.main.resource_group_name

@@ -1,4 +1,8 @@
 # Changelog
+
+## v1.2.3 - 2026-01-19
+* Fix `for_each` fallback to use `toset([])` for certificates and groups.
+
 ## v1.2.2 - 2026-01-16
 * Add outputs for the resources created.
 
