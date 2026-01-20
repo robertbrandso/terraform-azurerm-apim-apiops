@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.4 - 2026-01-20
+* Simplify exported outputs to improve structure and clarity.
+
 ## v1.2.3 - 2026-01-19
 * Fix `for_each` fallback to use `toset([])` for certificates and groups.
 
